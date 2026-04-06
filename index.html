@@ -6,45 +6,75 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f2f2f2;
+      background: linear-gradient(120deg, #e0f7fa, #e1bee7);
       padding: 20px;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      color: #444;
     }
 
     .kirtan-box {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(8px);
-      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      border-radius: 14px;
       padding: 20px;
       margin-bottom: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      transition: transform 0.2s;
+    }
+
+    .kirtan-box:hover {
+      transform: translateY(-2px);
     }
 
     .kirtan-title {
       font-weight: bold;
-      font-size: 1.2em;
+      font-size: 1.3em;
+      margin-bottom: 5px;
+      color: #222;
+    }
+
+    .kirtan-artist {
+      font-size: 1em;
       margin-bottom: 10px;
+      color: #555;
     }
 
     .lyrics {
       white-space: pre-wrap;
       margin-top: 10px;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
 
-    /* Glass-style button */
+    .lyrics.show {
+      display: block;
+      opacity: 1;
+    }
+
     .btn {
       background-color: rgba(255, 255, 255, 0.2);
       color: white;
-      padding: 8px 16px;
+      padding: 8px 18px;
       border: 1px solid rgba(255, 255, 255, 0.5);
       border-radius: 10px;
       cursor: pointer;
       backdrop-filter: blur(6px);
-      transition: background 0.3s, transform 0.2s;
+      transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+      font-weight: bold;
+      margin-top: 5px;
     }
 
     .btn:hover {
-      background-color: rgba(255, 255, 255, 0.3);
+      background-color: rgba(255, 255, 255, 0.35);
       transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
   </style>
 </head>
@@ -65,30 +95,33 @@
           const box = document.createElement("div");
           box.className = "kirtan-box";
 
+          // Title
           const title = document.createElement("div");
           title.className = "kirtan-title";
-          title.textContent = kirtan.title + " — " + kirtan.artist;
+          title.textContent = kirtan.title;
 
+          // Artist
+          const artist = document.createElement("div");
+          artist.className = "kirtan-artist";
+          artist.textContent = kirtan.artist;
+
+          // Lyrics
           const lyrics = document.createElement("div");
           lyrics.className = "lyrics";
           lyrics.textContent = kirtan.lyrics;
-          lyrics.style.display = "none"; // ensure it starts hidden
 
+          // Show/Hide button
           const btn = document.createElement("button");
           btn.className = "btn";
           btn.textContent = "Show Lyrics";
 
           btn.onclick = () => {
-            if (lyrics.style.display === "none") {
-              lyrics.style.display = "block";
-              btn.textContent = "Hide Lyrics";
-            } else {
-              lyrics.style.display = "none";
-              btn.textContent = "Show Lyrics";
-            }
+            lyrics.classList.toggle("show");
+            btn.textContent = lyrics.classList.contains("show") ? "Hide Lyrics" : "Show Lyrics";
           };
 
           box.appendChild(title);
+          box.appendChild(artist);
           box.appendChild(btn);
           box.appendChild(lyrics);
           container.appendChild(box);
