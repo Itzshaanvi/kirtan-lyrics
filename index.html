@@ -52,8 +52,8 @@
 
   <script>
     // Replace this URL with your raw GitHub JSON URL
-    const lyrics.json = "https://raw.githubusercontent.com/itzshaanvi/kirtan-lyrics/main/lyrics.json";
-    fetch(lyrics.json)
+    const jsonURL = "https://raw.githubusercontent.com/itzshaanvi/kirtan-lyrics/main/lyrics.json";
+    fetch(jsonURL)
       .then(response => response.json())
       .then(data => {
         const container = document.getElementById("kirtan-container");
