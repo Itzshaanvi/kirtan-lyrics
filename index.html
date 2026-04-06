@@ -14,17 +14,45 @@
 
     h1 {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
       color: #444;
+    }
+
+    /* Search bar */
+    #search-container {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    #search-input {
+      width: 50%;
+      padding: 10px 15px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.2);
+      outline: none;
+    }
+
+    .artist-section {
+      margin-bottom: 40px;
+    }
+
+    .artist-name {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #222;
+      border-bottom: 2px solid rgba(0,0,0,0.1);
+      padding-bottom: 5px;
     }
 
     .kirtan-box {
       background: rgba(255, 255, 255, 0.25);
       backdrop-filter: blur(10px);
       border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
       transition: transform 0.2s;
     }
 
@@ -34,15 +62,9 @@
 
     .kirtan-title {
       font-weight: bold;
-      font-size: 1.3em;
+      font-size: 1.2em;
       margin-bottom: 5px;
       color: #222;
-    }
-
-    .kirtan-artist {
-      font-size: 1em;
-      margin-bottom: 10px;
-      color: #555;
     }
 
     .lyrics {
@@ -61,7 +83,7 @@
     .btn {
       background-color: rgba(255, 255, 255, 0.2);
       color: white;
-      padding: 8px 18px;
+      padding: 6px 14px;
       border: 1px solid rgba(255, 255, 255, 0.5);
       border-radius: 10px;
       cursor: pointer;
@@ -76,11 +98,21 @@
       transform: scale(1.05);
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
+
+    /* Hide artists with no matches in search */
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
 
   <h1>Kirtan Library</h1>
+
+  <div id="search-container">
+    <input type="text" id="search-input" placeholder="Search by artist or song title...">
+  </div>
+
   <div id="kirtan-container"></div>
 
   <script>
@@ -91,40 +123,77 @@
       .then(data => {
         const container = document.getElementById("kirtan-container");
 
+        // Group songs by artist
+        const artists = {};
         data.forEach(kirtan => {
-          const box = document.createElement("div");
-          box.className = "kirtan-box";
+          if (!artists[kirtan.artist]) {
+            artists[kirtan.artist] = [];
+          }
+          artists[kirtan.artist].push(kirtan);
+        });
 
-          // Title
-          const title = document.createElement("div");
-          title.className = "kirtan-title";
-          title.textContent = kirtan.title;
+        // Create sections per artist
+        for (const artistName in artists) {
+          const section = document.createElement("div");
+          section.className = "artist-section";
 
-          // Artist
-          const artist = document.createElement("div");
-          artist.className = "kirtan-artist";
-          artist.textContent = kirtan.artist;
+          const artistHeader = document.createElement("div");
+          artistHeader.className = "artist-name";
+          artistHeader.textContent = artistName;
 
-          // Lyrics
-          const lyrics = document.createElement("div");
-          lyrics.className = "lyrics";
-          lyrics.textContent = kirtan.lyrics;
+          section.appendChild(artistHeader);
 
-          // Show/Hide button
-          const btn = document.createElement("button");
-          btn.className = "btn";
-          btn.textContent = "Show Lyrics";
+          artists[artistName].forEach(kirtan => {
+            const box = document.createElement("div");
+            box.className = "kirtan-box";
 
-          btn.onclick = () => {
-            lyrics.classList.toggle("show");
-            btn.textContent = lyrics.classList.contains("show") ? "Hide Lyrics" : "Show Lyrics";
-          };
+            const title = document.createElement("div");
+            title.className = "kirtan-title";
+            title.textContent = kirtan.title;
 
-          box.appendChild(title);
-          box.appendChild(artist);
-          box.appendChild(btn);
-          box.appendChild(lyrics);
-          container.appendChild(box);
+            const lyrics = document.createElement("div");
+            lyrics.className = "lyrics";
+            lyrics.textContent = kirtan.lyrics;
+
+            const btn = document.createElement("button");
+            btn.className = "btn";
+            btn.textContent = "Show Lyrics";
+            btn.onclick = () => {
+              lyrics.classList.toggle("show");
+              btn.textContent = lyrics.classList.contains("show") ? "Hide Lyrics" : "Show Lyrics";
+            };
+
+            box.appendChild(title);
+            box.appendChild(btn);
+            box.appendChild(lyrics);
+            section.appendChild(box);
+          });
+
+          container.appendChild(section);
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById("search-input");
+        searchInput.addEventListener("input", () => {
+          const query = searchInput.value.toLowerCase();
+
+          document.querySelectorAll(".artist-section").forEach(section => {
+            let matches = 0;
+
+            section.querySelectorAll(".kirtan-box").forEach(box => {
+              const title = box.querySelector(".kirtan-title").textContent.toLowerCase();
+              const artist = section.querySelector(".artist-name").textContent.toLowerCase();
+              if (title.includes(query) || artist.includes(query)) {
+                box.style.display = "block";
+                matches++;
+              } else {
+                box.style.display = "none";
+              }
+            });
+
+            // Hide artist section if no songs match
+            section.classList.toggle("hidden", matches === 0);
+          });
         });
       })
       .catch(err => console.error("Failed to load kirtans:", err));
