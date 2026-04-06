@@ -1,42 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Kirtan Lyrics Library</title>
+  <meta charset="UTF-8">
+  <title>Kirtan Library</title>
   <style>
-    body { font-family: sans-serif; background: #f0f0f0; padding: 20px; }
-    .song { background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); padding: 15px; margin-bottom: 10px; border-radius: 12px; }
-    .lyrics { display: none; margin-top: 10px; white-space: pre-wrap; }
-    button { margin-top: 5px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 20px;
+    }
+    .kirtan-box {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .kirtan-title {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .lyrics {
+      white-space: pre-wrap;
+      display: none;
+      margin-top: 10px;
+    }
+    .btn {
+      margin-top: 10px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <h1>Kirtan Lyrics Library</h1>
-  <div id="lyrics-container"></div>
+
+  <h1>Kirtan Library</h1>
+  <div id="kirtan-container"></div>
 
   <script>
-    const rawUrl = 'https://raw.githubusercontent.com/YOUR_USERNAME/kirtan-lyrics/main/lyrics.json';
+    // Replace this URL with your raw GitHub JSON URL
+    const jsonURL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/lyrics.json";
 
-    fetch(rawUrl)
-      .then(res => res.json())
+    fetch(jsonURL)
+      .then(response => response.json())
       .then(data => {
-        const container = document.getElementById('lyrics-container');
-        data.forEach(song => {
-          const div = document.createElement('div');
-          div.className = 'song';
-          div.innerHTML = `
-            <h2>${song.title} - ${song.artist}</h2>
-            <button>Show/Hide Lyrics</button>
-            <div class="lyrics">${song.lyrics}</div>
-          `;
-          const btn = div.querySelector('button');
-          const lyricsDiv = div.querySelector('.lyrics');
+        const container = document.getElementById("kirtan-container");
+
+        data.forEach(kirtan => {
+          const box = document.createElement("div");
+          box.className = "kirtan-box";
+
+          const title = document.createElement("div");
+          title.className = "kirtan-title";
+          title.textContent = kirtan.title + " — " + kirtan.artist;
+
+          const lyrics = document.createElement("div");
+          lyrics.className = "lyrics";
+          lyrics.textContent = kirtan.lyrics;
+
+          const btn = document.createElement("button");
+          btn.className = "btn";
+          btn.textContent = "Show Lyrics";
           btn.onclick = () => {
-            lyricsDiv.style.display = lyricsDiv.style.display === 'none' ? 'block' : 'none';
-          }
-          container.appendChild(div);
+            if (lyrics.style.display === "none") {
+              lyrics.style.display = "block";
+              btn.textContent = "Hide Lyrics";
+            } else {
+              lyrics.style.display = "none";
+              btn.textContent = "Show Lyrics";
+            }
+          };
+
+          box.appendChild(title);
+          box.appendChild(btn);
+          box.appendChild(lyrics);
+          container.appendChild(box);
         });
       })
-      .catch(err => console.error('Error loading lyrics:', err));
+      .catch(err => console.error("Failed to load kirtans:", err));
   </script>
 </body>
 </html>
